@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eventory - Organizer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6366f1",
+              secondary: "#8b5cf6",
+              accent: "#f59e0b",
+              dark: "#0f172a",
+              "glass-bg": "rgba(255, 255, 255, 0.1)",
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              glow: "glow 2s ease-in-out infinite alternate",
+              "slide-up": "slideUp 0.5s ease-out",
+              "bounce-gentle": "bounceGentle 2s ease-in-out infinite",
+              "pulse-glow": "pulseGlow 2s ease-in-out infinite",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-10px)" },
+              },
+              glow: {
+                "0%": { boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)" },
+                "100%": { boxShadow: "0 0 40px rgba(99, 102, 241, 0.8)" },
+              },
+              slideUp: {
+                "0%": { opacity: "0", transform: "translateY(30px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              bounceGentle: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-5px)" },
+              },
+              pulseGlow: {
+                "0%, 100%": { opacity: "1", transform: "scale(1)" },
+                "50%": { opacity: "0.8", transform: "scale(1.05)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .dark-glass {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.2),
+          rgba(139, 92, 246, 0.2)
+        );
+        filter: blur(40px);
+        animation: float 8s ease-in-out infinite;
+        z-index: 0;
+      }
+      .status-pending {
+        @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30;
+      }
+      .status-confirmed {
+        @apply bg-green-500/20 text-green-300 border border-green-500/30;
+      }
+      .status-completed {
+        @apply bg-blue-500/20 text-blue-300 border border-blue-500/30;
+      }
+      .notification-unread {
+        animation: pulseGlow 2s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white min-h-screen"
+  >
+    <!-- Floating Orbs Background -->
+    <div
+      class="floating-orb w-64 h-64 top-20 -left-16"
+      style="animation-delay: 0s"
+    ></div>
+    <div
+      class="floating-orb w-80 h-80 top-1/2 -right-24"
+      style="animation-delay: 3s"
+    ></div>
+    <div
+      class="floating-orb w-48 h-48 bottom-1/4 left-1/3"
+      style="animation-delay: 6s"
+    ></div>
+
+    <!-- Navigation -->
+    <nav class="glass-effect sticky top-0 z-50 transition-all duration-500">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+          <div class="flex items-center space-x-3">
+            <div
+              class="bg-gradient-to-r from-primary to-secondary p-3 rounded-2xl shadow-lg animate-glow"
+            >
+              <i class="fas fa-calendar-stars text-2xl text-white"></i>
+            </div>
+            <span class="text-3xl font-bold gradient-text">Eventory</span>
+          </div>
+          <div class="flex items-center space-x-6">
+            <div class="relative">
+              <button
+                onclick="toggleNotifications()"
+                class="glass-effect p-3 rounded-xl hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105 relative"
+              >
+                <i class="fas fa-bell text-xl"></i>
+                <span
+                  id="notificationBadge"
+                  class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse"
+                  >3</span
+                >
+              </button>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-user text-white"></i>
+              </div>
+              <div>
+                <p class="font-semibold">Maria Santos</p>
+                <p class="text-sm text-gray-300">Event Organizer</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <!-- Welcome Section -->
+      <div class="mb-8 animate-slide-up">
+        <h1 class="text-4xl font-bold mb-2">
+          Welcome back, <span class="gradient-text">Maria!</span>
+        </h1>
+        <p class="text-gray-300 text-lg">
+          Manage your events and connect with amazing vendors
+        </p>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div
+          class="dark-glass p-6 rounded-2xl hover:scale-105 transition-all duration-300 animate-slide-up"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-300 text-sm">Active Bookings</p>
+              <p class="text-3xl font-bold text-primary">8</p>
+            </div>
+            <div class="bg-primary/20 p-3 rounded-xl">
+              <i class="fas fa-calendar-check text-primary text-xl"></i>
+            </div>
+          </div>
+        </div>
+        <div
+          class="dark-glass p-6 rounded-2xl hover:scale-105 transition-all duration-300 animate-slide-up"
+          style="animation-delay: 0.1s"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-300 text-sm">This Month</p>
+              <p class="text-3xl font-bold text-secondary">12</p>
+            </div>
+            <div class="bg-secondary/20 p-3 rounded-xl">
+              <i class="fas fa-chart-line text-secondary text-xl"></i>
+            </div>
+          </div>
+        </div>
+        <div
+          class="dark-glass p-6 rounded-2xl hover:scale-105 transition-all duration-300 animate-slide-up"
+          style="animation-delay: 0.2s"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-300 text-sm">Saved Vendors</p>
+              <p class="text-3xl font-bold text-accent">24</p>
+            </div>
+            <div class="bg-accent/20 p-3 rounded-xl">
+              <i class="fas fa-heart text-accent text-xl"></i>
+            </div>
+          </div>
+        </div>
+        <div
+          class="dark-glass p-6 rounded-2xl hover:scale-105 transition-all duration-300 animate-slide-up"
+          style="animation-delay: 0.3s"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-300 text-sm">Total Spent</p>
+              <p class="text-3xl font-bold text-green-400">₱45K</p>
+            </div>
+            <div class="bg-green-400/20 p-3 rounded-xl">
+              <i class="fas fa-peso-sign text-green-400 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Current Bookings Section -->
+        <div class="lg:col-span-2">
+          <div class="dark-glass p-6 rounded-2xl animate-slide-up">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-2xl font-bold flex items-center">
+                <i class="fas fa-calendar-alt mr-3 text-primary"></i>
+                Current Bookings
+              </h2>
+              <button
+                class="text-primary hover:text-secondary transition-colors"
+              >
+                <i class="fas fa-plus mr-2"></i>New Event
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              <!-- Booking Item 1 -->
+              <div
+                class="glass-effect p-4 rounded-xl hover:scale-[1.02] transition-all duration-300"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-bold text-lg">Sarah & John's Wedding</h3>
+                  <span
+                    class="status-pending px-3 py-1 rounded-full text-sm font-medium"
+                    >Pending</span
+                  >
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-calendar mr-2 text-primary"></i>
+                    March 15, 2025
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-map-marker-alt mr-2 text-secondary"></i>
+                    Marco Polo Hotel, Cebu
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-users mr-2 text-accent"></i>
+                    150 guests
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-peso-sign mr-2 text-green-400"></i>
+                    ₱85,000 budget
+                  </div>
+                </div>
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex items-center space-x-2">
+                    <div class="flex -space-x-2">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full border-2 border-slate-900 flex items-center justify-center"
+                      >
+                        <i class="fas fa-camera text-xs text-white"></i>
+                      </div>
+                      <div
+                        class="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-full border-2 border-slate-900 flex items-center justify-center"
+                      >
+                        <i class="fas fa-utensils text-xs text-white"></i>
+                      </div>
+                      <div
+                        class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-red-500 rounded-full border-2 border-slate-900 flex items-center justify-center"
+                      >
+                        <i class="fas fa-music text-xs text-white"></i>
+                      </div>
+                    </div>
+                    <span class="text-gray-300 text-sm">+2 more vendors</span>
+                  </div>
+                  <button
+                    class="bg-gradient-to-r from-primary to-secondary px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all hover:scale-105"
+                  >
+                    <i class="fas fa-eye mr-2"></i>View Details
+                  </button>
+                </div>
+              </div>
+
+              <!-- Booking Item 2 -->
+              <div
+                class="glass-effect p-4 rounded-xl hover:scale-[1.02] transition-all duration-300"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-bold text-lg">Corporate Annual Gala</h3>
+                  <span
+                    class="status-confirmed px-3 py-1 rounded-full text-sm font-medium"
+                    >Confirmed</span
+                  >
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-calendar mr-2 text-primary"></i>
+                    April 20, 2025
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-map-marker-alt mr-2 text-secondary"></i>
+                    Radisson Blu, Cebu
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-users mr-2 text-accent"></i>
+                    300 guests
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-peso-sign mr-2 text-green-400"></i>
+                    ₱120,000 budget
+                  </div>
+                </div>
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex items-center space-x-2">
+                    <div class="flex -space-x-2">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-2 border-slate-900 flex items-center justify-center"
+                      >
+                        <i class="fas fa-microphone text-xs text-white"></i>
+                      </div>
+                      <div
+                        class="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full border-2 border-slate-900 flex items-center justify-center"
+                      >
+                        <i class="fas fa-utensils text-xs text-white"></i>
+                      </div>
+                    </div>
+                    <span class="text-gray-300 text-sm"
+                      >All vendors confirmed</span
+                    >
+                  </div>
+                  <button
+                    class="bg-gradient-to-r from-primary to-secondary px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all hover:scale-105"
+                  >
+                    <i class="fas fa-eye mr-2"></i>View Details
+                  </button>
+                </div>
+              </div>
+
+              <!-- Booking Item 3 -->
+              <div
+                class="glass-effect p-4 rounded-xl hover:scale-[1.02] transition-all duration-300"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-bold text-lg">Birthday Celebration</h3>
+                  <span
+                    class="status-completed px-3 py-1 rounded-full text-sm font-medium"
+                    >Completed</span
+                  >
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-calendar mr-2 text-primary"></i>
+                    February 28, 2025
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-map-marker-alt mr-2 text-secondary"></i>
+                    Private Residence, Lapu-Lapu
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-users mr-2 text-accent"></i>
+                    50 guests
+                  </div>
+                  <div class="flex items-center text-gray-300">
+                    <i class="fas fa-peso-sign mr-2 text-green-400"></i>
+                    ₱25,000 spent
+                  </div>
+                </div>
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex items-center space-x-2">
+                    <div class="flex text-yellow-400 text-sm">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-gray-300 text-sm">Event completed</span>
+                  </div>
+                  <button
+                    class="glass-effect px-4 py-2 rounded-lg text-sm font-medium hover:bg-white hover:text-slate-900 transition-all hover:scale-105"
+                  >
+                    <i class="fas fa-star mr-2"></i>Rate Vendors
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 text-center">
+              <button
+                class="text-primary hover:text-secondary transition-colors font-medium"
+              >
+                <i class="fas fa-chevron-down mr-2"></i>View All Bookings
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="space-y-6">
+          <!-- Quick Vendor Search -->
+          <div class="dark-glass p-6 rounded-2xl animate-slide-up">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+              <i class="fas fa-search mr-3 text-primary"></i>
+              Quick Vendor Search
+            </h2>
+            <div class="space-y-4">
+              <div class="relative">
+                <input
+                  type="text"
+                  placeholder="Search vendors..."
+                  class="w-full p-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent transition-all pl-10"
+                />
+                <i
+                  class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                ></i>
+              </div>
+              <select
+                class="w-full p-3 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              >
+                <option>All Categories</option>
+                <option>🍽️ Catering Services</option>
+                <option>📸 Photography</option>
+                <option>🎵 Sound & DJ</option>
+                <option>🎭 Entertainment</option>
+                <option>💄 Makeup & Styling</option>
+              </select>
+              <button
+                class="w-full bg-gradient-to-r from-primary to-secondary p-3 rounded-xl font-semibold hover:shadow-lg transition-all hover:scale-105 group"
+              >
+                <i class="fas fa-search mr-2 group-hover:animate-spin"></i>
+                Search Vendors
+              </button>
+            </div>
+          </div>
+
+          <!-- Notifications Panel -->
+          <div
+            class="dark-glass p-6 rounded-2xl animate-slide-up"
+            style="animation-delay: 0.2s"
+          >
+            <h2
+              class="text-xl font-bold mb-4 flex items-center justify-between"
+            >
+              <span class="flex items-center">
+                <i class="fas fa-bell mr-3 text-accent"></i>
+                Notifications
+              </span>
+              <span
+                class="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                >3</span
+              >
+            </h2>
+            <div class="space-y-3">
+              <!-- Notification 1 -->
+              <div
+                class="notification-unread glass-effect p-3 rounded-lg border-l-4 border-l-primary"
+              >
+                <div class="flex items-start space-x-3">
+                  <div class="bg-primary/20 p-2 rounded-lg">
+                    <i class="fas fa-check-circle text-primary text-sm"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-medium text-sm">Booking Confirmed!</p>
+                    <p class="text-gray-300 text-xs">
+                      Dream Caterers accepted your wedding booking
+                    </p>
+                    <p class="text-gray-400 text-xs mt-1">2 hours ago</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notification 2 -->
+              <div
+                class="notification-unread glass-effect p-3 rounded-lg border-l-4 border-l-secondary"
+              >
+                <div class="flex items-start space-x-3">
+                  <div class="bg-secondary/20 p-2 rounded-lg">
+                    <i class="fas fa-camera text-secondary text-sm"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-medium text-sm">New Quote Received</p>
+                    <p class="text-gray-300 text-xs">
+                      Pixel Perfect Photography sent you a quote
+                    </p>
+                    <p class="text-gray-400 text-xs mt-1">5 hours ago</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notification 3 -->
+              <div
+                class="notification-unread glass-effect p-3 rounded-lg border-l-4 border-l-accent"
+              >
+                <div class="flex items-start space-x-3">
+                  <div class="bg-accent/20 p-2 rounded-lg">
+                    <i class="fas fa-heart text-accent text-sm"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-medium text-sm">New Vendor Match</p>
+                    <p class="text-gray-300 text-xs">
+                      3 new vendors match your wedding criteria
+                    </p>
+                    <p class="text-gray-400 text-xs mt-1">1 day ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 text-center">
+              <button
+                class="text-primary hover:text-secondary transition-colors text-sm font-medium"
+              >
+                View All Notifications
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div
+            class="dark-glass p-6 rounded-2xl animate-slide-up"
+            style="animation-delay: 0.4s"
+          >
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+              <i class="fas fa-clock mr-3 text-green-400"></i>
+              Recent Activity
+            </h2>
+            <div class="space-y-3">
+              <div class="flex items-center space-x-3 text-sm">
+                <div
+                  class="w-2 h-2 bg-primary rounded-full animate-pulse"
+                ></div>
+                <span class="text-gray-300"
+                  >Saved "Elite Sounds" to favorites</span
+                >
+              </div>
+              <div class="flex items-center space-x-3 text-sm">
+                <div class="w-2 h-2 bg-secondary rounded-full"></div>
+                <span class="text-gray-300"
+                  >Viewed "Luxury Florals" portfolio</span
+                >
+              </div>
+              <div class="flex items-center space-x-3 text-sm">
+                <div class="w-2 h-2 bg-accent rounded-full"></div>
+                <span class="text-gray-300"
+                  >Updated wedding guest count to 150</span
+                >
+              </div>
+              <div class="flex items-center space-x-3 text-sm">
+                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span class="text-gray-300"
+                  >Completed vendor review for "Taste Buds"</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Dropdown (Hidden by default) -->
+    <div
+      id="notificationDropdown"
+      class="fixed top-20 right-4 w-80 dark-glass rounded-2xl p-4 z-50 hidden"
+    >
+      <h3 class="font-bold mb-3 flex items-center justify-between">
+        <span>Recent Notifications</span>
+        <button
+          onclick="markAllAsRead()"
+          class="text-primary text-sm hover:text-secondary"
+        >
+          Mark all read
+        </button>
+      </h3>
+      <div class="space-y-2 max-h-64 overflow-y-auto">
+        <div class="glass-effect p-3 rounded-lg">
+          <p class="font-medium text-sm">Booking Confirmed!</p>
+          <p class="text-gray-300 text-xs">
+            Dream Caterers accepted your wedding booking
+          </p>
+        </div>
+        <div class="glass-effect p-3 rounded-lg">
+          <p class="font-medium text-sm">New Quote Received</p>
+          <p class="text-gray-300 text-xs">
+            Pixel Perfect Photography sent you a quote
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleNotifications() {
+        const dropdown = document.getElementById("notificationDropdown");
+        dropdown.classList.toggle("hidden");
+      }
+
+      function markAllAsRead() {
+        const badge = document.getElementById("notificationBadge");
+        badge.style.display = "none";
+        // Add logic to mark notifications as read
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", function (event) {
+        const dropdown = document.getElementById("notificationDropdown");
+        const bellButton = event.target.closest("button");
+
+        if (
+          !dropdown.contains(event.target) &&
+          (!bellButton || !bellButton.onclick)
+        ) {
+          dropdown.classList.add("hidden");
+        }
+      });
+
+      // Add some interactive animations
+      document.addEventListener("DOMContentLoaded", function () {
+        // Stagger animations for cards
+        const cards = document.querySelectorAll(".animate-slide-up");
+        cards.forEach((card, index) => {
+          card.style.animationDelay = `${index * 0.1}s`;
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eventory - Your Event Planning Partner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6366f1",
+              secondary: "#8b5cf6",
+              accent: "#f59e0b",
+              dark: "#0f172a",
+              "glass-bg": "rgba(255, 255, 255, 0.1)",
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              glow: "glow 2s ease-in-out infinite alternate",
+              "slide-up": "slideUp 0.5s ease-out",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+              glow: {
+                "0%": { boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)" },
+                "100%": { boxShadow: "0 0 40px rgba(99, 102, 241, 0.8)" },
+              },
+              slideUp: {
+                "0%": { opacity: "0", transform: "translateY(30px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .dark-glass {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.3),
+          rgba(139, 92, 246, 0.3)
+        );
+        filter: blur(40px);
+        animation: float 8s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-x-hidden"
+  >
+    <!-- Floating Orbs Background -->
+    <div
+      class="floating-orb w-72 h-72 top-10 -left-20"
+      style="animation-delay: 0s"
+    ></div>
+    <div
+      class="floating-orb w-96 h-96 top-1/3 -right-32"
+      style="animation-delay: 2s"
+    ></div>
+    <div
+      class="floating-orb w-64 h-64 bottom-1/4 left-1/4"
+      style="animation-delay: 4s"
+    ></div>
+
+    <!-- Navigation -->
+    <nav
+      class="fixed top-0 w-full z-50 glass-effect transition-all duration-500"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+          <div class="flex items-center space-x-3">
+            <div
+              class="bg-gradient-to-r from-primary to-secondary p-3 rounded-2xl shadow-lg animate-glow"
+            >
+              <i class="fas fa-calendar-stars text-2xl text-white"></i>
+            </div>
+            <span class="text-3xl font-bold gradient-text">Eventory</span>
+          </div>
+          <div class="hidden md:flex space-x-8">
+            <a
+              href="#"
+              class="text-gray-200 hover:text-white transition-all duration-300 hover:scale-105"
+              >Find Vendors</a
+            >
+            <a
+              href="#"
+              class="text-gray-200 hover:text-white transition-all duration-300 hover:scale-105"
+              >How It Works</a
+            >
+            <a
+              href="#"
+              class="text-gray-200 hover:text-white transition-all duration-300 hover:scale-105"
+              >Packages</a
+            >
+            <a
+              href="#"
+              class="text-gray-200 hover:text-white transition-all duration-300 hover:scale-105"
+              >About</a
+            >
+          </div>
+          <div class="flex space-x-3">
+            <button
+              onclick="openSignInModal()"
+              class="glass-effect text-white px-6 py-3 rounded-xl hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105"
+            >
+              <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+            </button>
+            <button
+              onclick="openRegisterModal()"
+              class="bg-gradient-to-r from-primary to-secondary px-6 py-3 rounded-xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-glow"
+            >
+              <i class="fas fa-user-plus mr-2"></i>Register
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section
+      class="min-h-screen flex items-center relative overflow-hidden pt-20"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="animate-slide-up">
+            <!-- <div class="inline-block bg-gradient-to-r from-primary to-secondary px-6 py-2 rounded-full text-sm font-medium mb-6">
+                        🎉 Now serving 500+ verified vendors across Philippines
+                    </div> -->
+            <h1 class="text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+              Plan Events Like a
+              <span class="gradient-text">Pro</span>
+            </h1>
+            <p class="text-xl mb-10 text-gray-300 leading-relaxed">
+              Skip the endless Facebook scrolling. Connect with verified local
+              vendors instantly, compare real-time pricing, and book your dream
+              event team with just a few clicks.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 mb-12">
+              <button
+                class="group bg-gradient-to-r from-primary to-secondary px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-glow"
+              >
+                <i class="fas fa-rocket mr-3 group-hover:animate-bounce"></i>
+                Start Planning Now
+                <i
+                  class="fas fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform"
+                ></i>
+              </button>
+              <!-- <button class="glass-effect px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105">
+                            <i class="fas fa-play mr-3"></i>Watch Demo
+                        </button> -->
+            </div>
+            <!-- <div class="flex items-center space-x-8 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex -space-x-2">
+                                <div class="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full border-2 border-white"></div>
+                                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-full border-2 border-white"></div>
+                                <div class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-red-500 rounded-full border-2 border-white"></div>
+                            </div>
+                            <span class="text-gray-300">2,500+ happy customers</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-300">4.9/5 rating</span>
+                        </div>
+                    </div> -->
+          </div>
+          <div class="relative animate-float">
+            <div class="dark-glass p-8 rounded-3xl shadow-2xl">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold">Quick Search</h3>
+                <div
+                  class="bg-green-500 w-3 h-3 rounded-full animate-pulse"
+                ></div>
+              </div>
+              <div class="space-y-6">
+                <div class="relative">
+                  <label class="block text-sm text-gray-300 mb-2 font-medium">
+                    <i class="fas fa-map-marker-alt mr-2 text-primary"></i
+                    >Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Cebu City, Cebu"
+                    class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  />
+                </div>
+                <div class="relative">
+                  <label class="block text-sm text-gray-300 mb-2 font-medium">
+                    <i class="fas fa-list mr-2 text-secondary"></i>Category
+                  </label>
+                  <select
+                    class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  >
+                    <option>All Categories</option>
+                    <option>🍽️ Catering Services</option>
+                    <option>📸 Photography & Videography</option>
+                    <option>🎵 Sound System & DJ</option>
+                    <option>🎭 Entertainment & Performers</option>
+                    <option>💄 Makeup & Styling</option>
+                    <option>👗 Dress & Suit Rental</option>
+                  </select>
+                </div>
+                <div class="relative">
+                  <label class="block text-sm text-gray-300 mb-2 font-medium">
+                    <i class="fas fa-calendar mr-2 text-accent"></i>Event Date
+                  </label>
+                  <input
+                    type="date"
+                    class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  />
+                </div>
+                <button
+                  class="w-full bg-gradient-to-r from-primary to-secondary p-4 rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
+                >
+                  <i class="fas fa-search mr-3 group-hover:animate-spin"></i>
+                  Find Perfect Vendors
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section class="py-20 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <div
+            class="inline-block bg-gradient-to-r from-primary to-secondary px-6 py-2 rounded-full text-sm font-medium mb-4"
+          >
+            🌟 Popular Categories
+          </div>
+          <h2 class="text-5xl font-bold mb-6">Everything You Need</h2>
+          <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+            From intimate gatherings to grand celebrations, find verified
+            vendors for every occasion
+          </p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            class="group dark-glass p-8 rounded-3xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+          >
+            <div
+              class="bg-gradient-to-r from-red-500 to-pink-500 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce"
+            >
+              <i class="fas fa-utensils text-2xl text-white"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Catering Services</h3>
+            <p class="text-gray-300 mb-4">
+              From Filipino classics to international cuisine
+            </p>
+            <div class="flex justify-between items-center">
+              <span class="text-primary font-semibold">150+ vendors</span>
+              <i
+                class="fas fa-arrow-right text-gray-400 group-hover:text-white group-hover:translate-x-2 transition-all"
+              ></i>
+            </div>
+          </div>
+          <div
+            class="group dark-glass p-8 rounded-3xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+          >
+            <div
+              class="bg-gradient-to-r from-blue-500 to-cyan-500 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce"
+            >
+              <i class="fas fa-camera text-2xl text-white"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Photography</h3>
+            <p class="text-gray-300 mb-4">
+              Capture every precious moment professionally
+            </p>
+            <div class="flex justify-between items-center">
+              <span class="text-primary font-semibold">89+ vendors</span>
+              <i
+                class="fas fa-arrow-right text-gray-400 group-hover:text-white group-hover:translate-x-2 transition-all"
+              ></i>
+            </div>
+          </div>
+          <div
+            class="group dark-glass p-8 rounded-3xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+          >
+            <div
+              class="bg-gradient-to-r from-green-500 to-emerald-500 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce"
+            >
+              <i class="fas fa-volume-up text-2xl text-white"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Sound & DJ</h3>
+            <p class="text-gray-300 mb-4">
+              Crystal clear audio and party vibes
+            </p>
+            <div class="flex justify-between items-center">
+              <span class="text-primary font-semibold">67+ vendors</span>
+              <i
+                class="fas fa-arrow-right text-gray-400 group-hover:text-white group-hover:translate-x-2 transition-all"
+              ></i>
+            </div>
+          </div>
+          <div
+            class="group dark-glass p-8 rounded-3xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+          >
+            <div
+              class="bg-gradient-to-r from-purple-500 to-indigo-500 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce"
+            >
+              <i class="fas fa-music text-2xl text-white"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Entertainment</h3>
+            <p class="text-gray-300 mb-4">Bands, performers, and live shows</p>
+            <div class="flex justify-between items-center">
+              <span class="text-primary font-semibold">43+ vendors</span>
+              <i
+                class="fas fa-arrow-right text-gray-400 group-hover:text-white group-hover:translate-x-2 transition-all"
+              ></i>
+            </div>
+          </div>
+          <div
+            class="group dark-glass p-8 rounded-3xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+          >
+            <div
+              class="bg-gradient-to-r from-pink-500 to-rose-500 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce"
+            >
+              <i class="fas fa-palette text-2xl text-white"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Makeup Artists</h3>
+            <p class="text-gray-300 mb-4">Look stunning on your special day</p>
+            <div class="flex justify-between items-center">
+              <span class="text-primary font-semibold">56+ vendors</span>
+              <i
+                class="fas fa-arrow-right text-gray-400 group-hover:text-white group-hover:translate-x-2 transition-all"
+              ></i>
+            </div>
+          </div>
+          <div
+            class="group dark-glass p-8 rounded-3xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+          >
+            <div
+              class="bg-gradient-to-r from-yellow-500 to-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce"
+            >
+              <i class="fas fa-tshirt text-2xl text-white"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Formal Wear</h3>
+            <p class="text-gray-300 mb-4">Elegant dresses and sharp suits</p>
+            <div class="flex justify-between items-center">
+              <span class="text-primary font-semibold">32+ vendors</span>
+              <i
+                class="fas fa-arrow-right text-gray-400 group-hover:text-white group-hover:translate-x-2 transition-all"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <div
+            class="inline-block bg-gradient-to-r from-primary to-secondary px-6 py-2 rounded-full text-sm font-medium mb-4"
+          >
+            ⚡ Simple Process
+          </div>
+          <h2 class="text-5xl font-bold mb-6">How Eventory Works</h2>
+          <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+            Three simple steps to your perfect event
+          </p>
+        </div>
+        <div class="grid lg:grid-cols-3 gap-12">
+          <div class="text-center group">
+            <div class="relative mb-8">
+              <div
+                class="bg-gradient-to-r from-primary to-secondary w-24 h-24 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold group-hover:animate-bounce transition-all duration-500"
+              >
+                1
+              </div>
+              <div
+                class="absolute -top-4 -right-4 w-6 h-6 bg-accent rounded-full animate-pulse"
+              ></div>
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Smart Search</h3>
+            <p class="text-gray-300 text-lg leading-relaxed">
+              Use AI-powered filters to find exactly what you need. No more
+              endless scrolling through social media posts.
+            </p>
+          </div>
+          <div class="text-center group">
+            <div class="relative mb-8">
+              <div
+                class="bg-gradient-to-r from-secondary to-purple-600 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold group-hover:animate-bounce transition-all duration-500"
+              >
+                2
+              </div>
+              <div
+                class="absolute -top-4 -right-4 w-6 h-6 bg-green-500 rounded-full animate-pulse"
+              ></div>
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Compare & Choose</h3>
+            <p class="text-gray-300 text-lg leading-relaxed">
+              View detailed portfolios, read verified reviews, and get
+              transparent pricing with real-time availability.
+            </p>
+          </div>
+          <div class="text-center group">
+            <div class="relative mb-8">
+              <div
+                class="bg-gradient-to-r from-accent to-red-500 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto text-3xl font-bold group-hover:animate-bounce transition-all duration-500"
+              >
+                3
+              </div>
+              <div
+                class="absolute -top-4 -right-4 w-6 h-6 bg-pink-500 rounded-full animate-pulse"
+              ></div>
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Book & Relax</h3>
+            <p class="text-gray-300 text-lg leading-relaxed">
+              Secure payment via GCash, instant SMS notifications, and seamless
+              coordination through our platform.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 relative">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="dark-glass p-12 rounded-3xl">
+          <h2 class="text-4xl font-bold mb-6">
+            Ready to Plan Your Dream Event?
+          </h2>
+          <p class="text-xl text-gray-300 mb-8">
+            Join thousands of satisfied customers who trust Eventory for their
+            special occasions.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              class="bg-gradient-to-r from-primary to-secondary px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
+            >
+              <i class="fas fa-rocket mr-3 group-hover:animate-bounce"></i>
+              Start Planning Now
+            </button>
+            <button
+              class="glass-effect px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105"
+            >
+              <i class="fas fa-store mr-3"></i>
+              Join as Vendor
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 border-t border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center space-x-3 mb-6">
+              <div
+                class="bg-gradient-to-r from-primary to-secondary p-3 rounded-2xl"
+              >
+                <i class="fas fa-calendar-stars text-xl text-white"></i>
+              </div>
+              <span class="text-2xl font-bold gradient-text">Eventory</span>
+            </div>
+            <p class="text-gray-400 mb-6">
+              Revolutionizing event planning in the Philippines with technology
+              and trust.
+            </p>
+            <div class="flex space-x-4">
+              <a
+                href="#"
+                class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center hover:bg-primary transition-all"
+              >
+                <i class="fab fa-facebook"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center hover:bg-primary transition-all"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center hover:bg-primary transition-all"
+              >
+                <i class="fab fa-twitter"></i>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3 class="font-bold mb-4 text-lg">For Event Planners</h3>
+            <ul class="space-y-3 text-gray-400">
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Find Vendors</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Package Deals</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Planning Tools</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Customer Stories</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold mb-4 text-lg">For Vendors</h3>
+            <ul class="space-y-3 text-gray-400">
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Join Platform</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Business Tools</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Success Stories</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Support Center</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold mb-4 text-lg">Contact</h3>
+            <div class="space-y-3 text-gray-400">
+              <p>
+                <i class="fas fa-envelope mr-3 text-primary"></i
+                >hello@eventory.ph
+              </p>
+              <p>
+                <i class="fas fa-phone mr-3 text-primary"></i>+63 917 123 4567
+              </p>
+              <p>
+                <i class="fas fa-map-marker-alt mr-3 text-primary"></i>Cebu
+                City, Philippines
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-slate-800 mt-12 pt-8 text-center text-gray-400"
+        >
+          <p>&copy; 2024 Eventory. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Sign In Modal -->
+    <div
+      id="signInModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+    >
+      <div
+        class="dark-glass p-8 rounded-3xl w-full max-w-md mx-4 animate-slide-up"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Welcome Back</h2>
+          <button
+            onclick="closeSignInModal()"
+            class="text-gray-400 hover:text-white"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        <form class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium mb-2">Email Address</label>
+            <input
+              type="email"
+              class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              placeholder="your@email.com"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Password</label>
+            <input
+              type="password"
+              class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              placeholder="••••••••"
+            />
+          </div>
+          <div class="flex justify-between items-center">
+            <label class="flex items-center">
+              <input type="checkbox" class="mr-2 rounded" />
+              <span class="text-sm text-gray-300">Remember me</span>
+            </label>
+            <a href="#" class="text-sm text-primary hover:underline"
+              >Forgot password?</a
+            >
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-gradient-to-r from-primary to-secondary p-4 rounded-xl font-bold hover:shadow-xl transition-all"
+          >
+            Sign In
+          </button>
+          <p class="text-center text-gray-400">
+            Don't have an account?
+            <button
+              type="button"
+              onclick="switchToRegister()"
+              class="text-primary hover:underline"
+            >
+              Register here
+            </button>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div
+      id="registerModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4 overflow-y-auto"
+    >
+      <div
+        class="dark-glass p-6 rounded-3xl w-full max-w-2xl my-8 animate-slide-up max-h-[90vh] overflow-y-auto"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-2xl font-bold">Join Eventory</h2>
+            <p class="text-gray-400 text-sm mt-1">
+              Create your account in seconds
+            </p>
+          </div>
+          <button
+            onclick="closeRegisterModal()"
+            class="text-gray-400 hover:text-white transition-colors"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <form class="space-y-4">
+          <!-- Personal Information -->
+          <div class="bg-slate-800/50 p-4 rounded-2xl">
+            <h3 class="text-lg font-semibold mb-3 text-primary">
+              <i class="fas fa-user mr-2"></i>Personal Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium mb-1">First Name</label>
+                <input
+                  type="text"
+                  class="w-full p-3 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+                  placeholder="Juan"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Last Name</label>
+                <input
+                  type="text"
+                  class="w-full p-3 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+                  placeholder="Dela Cruz"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1"
+                  >Email Address</label
+                >
+                <input
+                  type="email"
+                  class="w-full p-3 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+                  placeholder="your@email.com"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1"
+                  >Phone Number</label
+                >
+                <input
+                  type="tel"
+                  class="w-full p-3 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+                  placeholder="+63 917 123 4567"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Setup -->
+          <div class="bg-slate-800/50 p-4 rounded-2xl">
+            <h3 class="text-lg font-semibold mb-3 text-secondary">
+              <i class="fas fa-cog mr-2"></i>Account Setup
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-1">I am a...</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <label
+                    class="flex items-center p-3 bg-slate-800 rounded-xl border border-slate-600 cursor-pointer hover:border-primary transition-all"
+                  >
+                    <input
+                      type="radio"
+                      name="accountType"
+                      value="planner"
+                      class="mr-3 text-primary"
+                    />
+                    <div>
+                      <div class="font-medium text-sm">Event Planner</div>
+                      <div class="text-xs text-gray-400">
+                        Looking for vendors
+                      </div>
+                    </div>
+                  </label>
+                  <label
+                    class="flex items-center p-3 bg-slate-800 rounded-xl border border-slate-600 cursor-pointer hover:border-primary transition-all"
+                  >
+                    <input
+                      type="radio"
+                      name="accountType"
+                      value="vendor"
+                      class="mr-3 text-primary"
+                    />
+                    <div>
+                      <div class="font-medium text-sm">Service Vendor</div>
+                      <div class="text-xs text-gray-400">Offering services</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Password</label>
+                <input
+                  type="password"
+                  class="w-full p-3 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+                  placeholder="••••••••"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1"
+                  >Confirm Password</label
+                >
+                <input
+                  type="password"
+                  class="w-full p-3 bg-slate-800 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Terms and Actions -->
+          <div class="space-y-4">
+            <label class="flex items-start cursor-pointer">
+              <input type="checkbox" class="mr-3 mt-1 rounded text-primary" />
+              <span class="text-sm text-gray-300">
+                I agree to the
+                <a href="#" class="text-primary hover:underline"
+                  >Terms of Service</a
+                >
+                and
+                <a href="#" class="text-primary hover:underline"
+                  >Privacy Policy</a
+                >
+              </span>
+            </label>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button
+                type="submit"
+                class="flex-1 bg-gradient-to-r from-primary to-secondary p-3 rounded-xl font-bold hover:shadow-xl transition-all hover:scale-105 group"
+              >
+                <i class="fas fa-user-plus mr-2 group-hover:animate-bounce"></i>
+                Create Account
+              </button>
+              <button
+                type="button"
+                onclick="switchToSignIn()"
+                class="flex-1 glass-effect p-3 rounded-xl font-medium hover:bg-white hover:text-slate-900 transition-all"
+              >
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Sign In Instead
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Modal Functions
+      function openSignInModal() {
+        document.getElementById("signInModal").classList.remove("hidden");
+        document.getElementById("signInModal").classList.add("flex");
+      }
+
+      function closeSignInModal() {
+        document.getElementById("signInModal").classList.add("hidden");
+        document.getElementById("signInModal").classList.remove("flex");
+      }
+
+      function openRegisterModal() {
+        document.getElementById("registerModal").classList.remove("hidden");
+        document.getElementById("registerModal").classList.add("flex");
+      }
+
+      function closeRegisterModal() {
+        document.getElementById("registerModal").classList.add("hidden");
+        document.getElementById("registerModal").classList.remove("flex");
+      }
+
+      function switchToRegister() {
+        closeSignInModal();
+        openRegisterModal();
+      }
+
+      function switchToSignIn() {
+        closeRegisterModal();
+        openSignInModal();
+      }
+
+      // Close modals when clicking outside
+      document
+        .getElementById("signInModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeSignInModal();
+          }
+        });
+
+      document
+        .getElementById("registerModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeRegisterModal();
+          }
+        });
+
+      // Close modals with Escape key
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeSignInModal();
+          closeRegisterModal();
+        }
+      });
+
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+
+      // Add some interactive hover effects
+      document.querySelectorAll(".dark-glass").forEach((element) => {
+        element.addEventListener("mouseenter", function () {
+          this.style.transform = "translateY(-5px)";
+        });
+
+        element.addEventListener("mouseleave", function () {
+          this.style.transform = "translateY(0)";
+        });
+      });
+
+      // Form validation feedback
+      document.querySelectorAll('input[type="email"]').forEach((input) => {
+        input.addEventListener("blur", function () {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (this.value && !emailRegex.test(this.value)) {
+            this.style.borderColor = "#ef4444";
+          } else {
+            this.style.borderColor = "#475569";
+          }
+        });
+      });
+
+      // Phone number formatting
+      document.querySelectorAll('input[type="tel"]').forEach((input) => {
+        input.addEventListener("input", function () {
+          let value = this.value.replace(/\D/g, "");
+          if (value.startsWith("63")) {
+            value = "+" + value;
+          } else if (value.startsWith("9") && value.length === 10) {
+            value = "+63" + value;
+          }
+          this.value = value;
+        });
+      });
+    </script>
+  </body>
+</html>
