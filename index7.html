@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eventory - Event Packages</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6366f1",
+              secondary: "#8b5cf6",
+              accent: "#f59e0b",
+              dark: "#0f172a",
+              "glass-bg": "rgba(255, 255, 255, 0.1)",
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              glow: "glow 2s ease-in-out infinite alternate",
+              "slide-up": "slideUp 0.5s ease-out",
+              "slide-in": "slideIn 0.3s ease-out",
+              "fade-in": "fadeIn 0.3s ease-out",
+              "pulse-slow": "pulse 3s ease-in-out infinite",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+              glow: {
+                "0%": { boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)" },
+                "100%": { boxShadow: "0 0 40px rgba(99, 102, 241, 0.8)" },
+              },
+              slideUp: {
+                "0%": { opacity: "0", transform: "translateY(30px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              slideIn: {
+                "0%": { opacity: "0", transform: "scale(0.9)" },
+                "100%": { opacity: "1", transform: "scale(1)" },
+              },
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .dark-glass {
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.3),
+          rgba(139, 92, 246, 0.3)
+        );
+        filter: blur(40px);
+        animation: float 8s ease-in-out infinite;
+      }
+      .package-card {
+        transition: all 0.4s ease;
+        transform-style: preserve-3d;
+      }
+      .package-card:hover {
+        transform: translateY(-8px) rotateX(5deg);
+        box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+      }
+      .package-card.premium {
+        position: relative;
+        overflow: hidden;
+      }
+      .package-card.premium::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        animation: shimmer 2s infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+      .component-item {
+        transition: all 0.3s ease;
+      }
+      .component-item:hover {
+        background: rgba(99, 102, 241, 0.1);
+        transform: translateX(5px);
+      }
+      .savings-badge {
+        background: linear-gradient(135deg, #10b981, #059669);
+        animation: pulse-slow 2s ease-in-out infinite;
+      }
+      .price-strike {
+        position: relative;
+      }
+      .price-strike::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #ef4444;
+        transform: rotate(-5deg);
+      }
+      .customize-btn {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        transition: all 0.3s ease;
+      }
+      .customize-btn:hover {
+        background: linear-gradient(135deg, #d97706, #b45309);
+        transform: scale(1.05);
+      }
+      .book-btn {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        transition: all 0.3s ease;
+      }
+      .book-btn:hover {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white min-h-screen"
+  >
+    <!-- Floating Orbs Background -->
+    <div
+      class="floating-orb w-72 h-72 top-10 -left-20"
+      style="animation-delay: 0s"
+    ></div>
+    <div
+      class="floating-orb w-96 h-96 top-1/3 -right-32"
+      style="animation-delay: 2s"
+    ></div>
+    <div
+      class="floating-orb w-64 h-64 bottom-1/4 left-1/4"
+      style="animation-delay: 4s"
+    ></div>
+
+    <!-- Header -->
+    <header class="relative z-10 p-6">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <h1 class="text-3xl font-bold gradient-text">Eventory</h1>
+          <span class="text-gray-400">|</span>
+          <span class="text-lg text-gray-300">Event Packages</span>
+        </div>
+        <nav class="hidden md:flex space-x-6">
+          <a href="#" class="text-gray-300 hover:text-white transition-colors"
+            >Home</a
+          >
+          <a href="#" class="text-gray-300 hover:text-white transition-colors"
+            >Services</a
+          >
+          <a href="#" class="text-primary font-semibold">Packages</a>
+          <a href="#" class="text-gray-300 hover:text-white transition-colors"
+            >Contact</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-7xl mx-auto px-6 py-12">
+      <!-- Hero Section -->
+      <div class="text-center mb-16 animate-slide-up">
+        <h2 class="text-5xl font-bold mb-6 gradient-text">
+          Curated Event Packages
+        </h2>
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+          Skip the hassle of individual vendor selection. Our expertly curated
+          packages combine the best vendors and services for your perfect event.
+        </p>
+      </div>
+
+      <!-- Package Categories -->
+      <div
+        class="flex flex-wrap justify-center gap-4 mb-12 animate-slide-up"
+        style="animation-delay: 0.2s"
+      >
+        <button
+          class="category-btn bg-primary px-6 py-3 rounded-full font-semibold hover:bg-opacity-80 transition-all"
+        >
+          All Packages
+        </button>
+        <button
+          class="category-btn glass-effect px-6 py-3 rounded-full font-semibold hover:bg-opacity-80 transition-all"
+        >
+          Weddings
+        </button>
+        <button
+          class="category-btn glass-effect px-6 py-3 rounded-full font-semibold hover:bg-opacity-80 transition-all"
+        >
+          Corporate
+        </button>
+        <button
+          class="category-btn glass-effect px-6 py-3 rounded-full font-semibold hover:bg-opacity-80 transition-all"
+        >
+          Birthdays
+        </button>
+        <button
+          class="category-btn glass-effect px-6 py-3 rounded-full font-semibold hover:bg-opacity-80 transition-all"
+        >
+          Celebrations
+        </button>
+      </div>
+
+      <!-- Package Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+        <!-- Wedding Essentials Package -->
+        <div
+          class="package-card dark-glass rounded-3xl p-8 animate-slide-up"
+          style="animation-delay: 0.3s"
+        >
+          <div class="relative mb-6">
+            <div
+              class="absolute -top-4 -right-4 savings-badge text-white px-4 py-2 rounded-full text-sm font-bold"
+            >
+              Save $2,500
+            </div>
+            <div class="text-4xl mb-4">💍</div>
+            <h3 class="text-2xl font-bold mb-2">Wedding Essentials</h3>
+            <p class="text-gray-400 mb-4">
+              Everything you need for your dream wedding
+            </p>
+
+            <!-- Pricing -->
+            <div class="flex items-center space-x-4 mb-6">
+              <span class="text-3xl font-bold text-primary">$8,999</span>
+              <span class="text-lg text-gray-400 price-strike">$11,499</span>
+            </div>
+          </div>
+
+          <!-- Package Components -->
+          <div class="space-y-3 mb-6">
+            <h4 class="font-semibold text-lg mb-3">Package Includes:</h4>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-camera text-primary"></i>
+              <span>Professional Photography (8 hours)</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-utensils text-primary"></i>
+              <span>Catering for 100 guests</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-music text-primary"></i>
+              <span>DJ & Sound System</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-seedling text-primary"></i>
+              <span>Floral Arrangements</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-chair text-primary"></i>
+              <span>Tables & Chairs Setup</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button
+              class="book-btn w-full py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-calendar-check mr-2"></i>
+              Book Entire Package
+            </button>
+            <button
+              class="customize-btn w-full py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-cog mr-2"></i>
+              Customize Package
+            </button>
+          </div>
+        </div>
+
+        <!-- Birthday Party Bundle -->
+        <div
+          class="package-card dark-glass rounded-3xl p-8 animate-slide-up"
+          style="animation-delay: 0.4s"
+        >
+          <div class="relative mb-6">
+            <div
+              class="absolute -top-4 -right-4 savings-badge text-white px-4 py-2 rounded-full text-sm font-bold"
+            >
+              Save $800
+            </div>
+            <div class="text-4xl mb-4">🎉</div>
+            <h3 class="text-2xl font-bold mb-2">Birthday Party Bundle</h3>
+            <p class="text-gray-400 mb-4">
+              Make their special day unforgettable
+            </p>
+
+            <!-- Pricing -->
+            <div class="flex items-center space-x-4 mb-6">
+              <span class="text-3xl font-bold text-primary">$1,299</span>
+              <span class="text-lg text-gray-400 price-strike">$2,099</span>
+            </div>
+          </div>
+
+          <!-- Package Components -->
+          <div class="space-y-3 mb-6">
+            <h4 class="font-semibold text-lg mb-3">Package Includes:</h4>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-birthday-cake text-primary"></i>
+              <span>Custom Birthday Cake</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-gift text-primary"></i>
+              <span>Party Decorations & Balloons</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-camera text-primary"></i>
+              <span>Event Photography (4 hours)</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-pizza-slice text-primary"></i>
+              <span>Catering for 30 guests</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-gamepad text-primary"></i>
+              <span>Entertainment & Games</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button
+              class="book-btn w-full py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-calendar-check mr-2"></i>
+              Book Entire Package
+            </button>
+            <button
+              class="customize-btn w-full py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-cog mr-2"></i>
+              Customize Package
+            </button>
+          </div>
+        </div>
+
+        <!-- Corporate Excellence Package (Premium) -->
+        <div
+          class="package-card premium dark-glass rounded-3xl p-8 animate-slide-up border-2 border-accent"
+          style="animation-delay: 0.5s"
+        >
+          <div class="relative mb-6">
+            <div
+              class="absolute -top-4 -right-4 bg-accent text-dark px-4 py-2 rounded-full text-sm font-bold"
+            >
+              PREMIUM
+            </div>
+            <div class="text-4xl mb-4">🏢</div>
+            <h3 class="text-2xl font-bold mb-2">Corporate Excellence</h3>
+            <p class="text-gray-400 mb-4">Professional events that impress</p>
+
+            <!-- Pricing -->
+            <div class="flex items-center space-x-4 mb-6">
+              <span class="text-3xl font-bold text-accent">$4,999</span>
+              <span class="text-lg text-gray-400 price-strike">$6,799</span>
+            </div>
+          </div>
+
+          <!-- Package Components -->
+          <div class="space-y-3 mb-6">
+            <h4 class="font-semibold text-lg mb-3">Package Includes:</h4>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-microphone text-accent"></i>
+              <span>AV Equipment & Tech Support</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-coffee text-accent"></i>
+              <span>Premium Catering & Coffee Bar</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-user-tie text-accent"></i>
+              <span>Professional Event Coordinator</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-building text-accent"></i>
+              <span>Premium Venue (8 hours)</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-camera-retro text-accent"></i>
+              <span>Professional Photography</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button
+              class="bg-gradient-to-r from-accent to-yellow-600 w-full py-4 rounded-xl font-bold text-lg text-dark hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-crown mr-2"></i>
+              Book Premium Package
+            </button>
+            <button
+              class="customize-btn w-full py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-cog mr-2"></i>
+              Customize Package
+            </button>
+          </div>
+        </div>
+
+        <!-- Graduation Celebration -->
+        <div
+          class="package-card dark-glass rounded-3xl p-8 animate-slide-up"
+          style="animation-delay: 0.6s"
+        >
+          <div class="relative mb-6">
+            <div
+              class="absolute -top-4 -right-4 savings-badge text-white px-4 py-2 rounded-full text-sm font-bold"
+            >
+              Save $600
+            </div>
+            <div class="text-4xl mb-4">🎓</div>
+            <h3 class="text-2xl font-bold mb-2">Graduation Celebration</h3>
+            <p class="text-gray-400 mb-4">Celebrate this milestone in style</p>
+
+            <!-- Pricing -->
+            <div class="flex items-center space-x-4 mb-6">
+              <span class="text-3xl font-bold text-primary">$899</span>
+              <span class="text-lg text-gray-400 price-strike">$1,499</span>
+            </div>
+          </div>
+
+          <!-- Package Components -->
+          <div class="space-y-3 mb-6">
+            <h4 class="font-semibold text-lg mb-3">Package Includes:</h4>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-graduation-cap text-primary"></i>
+              <span>Graduation Themed Decorations</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-camera text-primary"></i>
+              <span>Photo Booth & Props</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-utensils text-primary"></i>
+              <span>Catering for 25 guests</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-music text-primary"></i>
+              <span>Background Music System</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-certificate text-primary"></i>
+              <span>Memory Book & Keepsakes</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button
+              class="book-btn w-full py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-calendar-check mr-2"></i>
+              Book Entire Package
+            </button>
+            <button
+              class="customize-btn w-full py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-cog mr-2"></i>
+              Customize Package
+            </button>
+          </div>
+        </div>
+
+        <!-- Anniversary Romance -->
+        <div
+          class="package-card dark-glass rounded-3xl p-8 animate-slide-up"
+          style="animation-delay: 0.7s"
+        >
+          <div class="relative mb-6">
+            <div
+              class="absolute -top-4 -right-4 savings-badge text-white px-4 py-2 rounded-full text-sm font-bold"
+            >
+              Save $450
+            </div>
+            <div class="text-4xl mb-4">💕</div>
+            <h3 class="text-2xl font-bold mb-2">Anniversary Romance</h3>
+            <p class="text-gray-400 mb-4">Celebrate your love story</p>
+
+            <!-- Pricing -->
+            <div class="flex items-center space-x-4 mb-6">
+              <span class="text-3xl font-bold text-primary">$699</span>
+              <span class="text-lg text-gray-400 price-strike">$1,149</span>
+            </div>
+          </div>
+
+          <!-- Package Components -->
+          <div class="space-y-3 mb-6">
+            <h4 class="font-semibold text-lg mb-3">Package Includes:</h4>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-rose text-primary"></i>
+              <span>Romantic Floral Arrangements</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-candle-holder text-primary"></i>
+              <span>Candlelit Dinner Setup</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-wine-glass text-primary"></i>
+              <span>Premium Wine & Dining</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-music text-primary"></i>
+              <span>Acoustic Background Music</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-heart text-primary"></i>
+              <span>Personalized Keepsakes</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button
+              class="book-btn w-full py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-calendar-check mr-2"></i>
+              Book Entire Package
+            </button>
+            <button
+              class="customize-btn w-full py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-cog mr-2"></i>
+              Customize Package
+            </button>
+          </div>
+        </div>
+
+        <!-- Holiday Spectacular -->
+        <div
+          class="package-card dark-glass rounded-3xl p-8 animate-slide-up"
+          style="animation-delay: 0.8s"
+        >
+          <div class="relative mb-6">
+            <div
+              class="absolute -top-4 -right-4 savings-badge text-white px-4 py-2 rounded-full text-sm font-bold"
+            >
+              Save $1,200
+            </div>
+            <div class="text-4xl mb-4">🎄</div>
+            <h3 class="text-2xl font-bold mb-2">Holiday Spectacular</h3>
+            <p class="text-gray-400 mb-4">Festive celebrations made magical</p>
+
+            <!-- Pricing -->
+            <div class="flex items-center space-x-4 mb-6">
+              <span class="text-3xl font-bold text-primary">$2,199</span>
+              <span class="text-lg text-gray-400 price-strike">$3,399</span>
+            </div>
+          </div>
+
+          <!-- Package Components -->
+          <div class="space-y-3 mb-6">
+            <h4 class="font-semibold text-lg mb-3">Package Includes:</h4>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-tree text-primary"></i>
+              <span>Holiday Themed Decorations</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-snowflake text-primary"></i>
+              <span>Winter Wonderland Setup</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-utensils text-primary"></i>
+              <span>Holiday Feast Catering</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-music text-primary"></i>
+              <span>Live Holiday Music</span>
+            </div>
+            <div
+              class="component-item flex items-center space-x-3 p-3 rounded-lg"
+            >
+              <i class="fas fa-gift text-primary"></i>
+              <span>Gift Exchange Coordination</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button
+              class="book-btn w-full py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-calendar-check mr-2"></i>
+              Book Entire Package
+            </button>
+            <button
+              class="customize-btn w-full py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            >
+              <i class="fas fa-cog mr-2"></i>
+              Customize Package
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom CTA Section -->
+      <div
+        class="text-center mt-16 p-8 dark-glass rounded-3xl animate-slide-up"
+        style="animation-delay: 0.9s"
+      >
+        <h3 class="text-3xl font-bold mb-4 gradient-text">
+          Can't Find the Perfect Package?
+        </h3>
+        <p class="text-lg text-gray-300 mb-6">
+          Let us create a custom package tailored specifically to your needs and
+          budget.
+        </p>
+        <button
+          class="bg-gradient-to-r from-accent to-yellow-600 px-8 py-4 rounded-2xl font-bold text-lg text-dark hover:shadow-2xl transition-all duration-300 hover:scale-105"
+        >
+          <i class="fas fa-magic mr-3"></i>
+          Create Custom Package
+          <i class="fas fa-arrow-right ml-3"></i>
+        </button>
+      </div>
+    </main>
+
+    <script>
+      // Add interactive animations on scroll
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in');
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.package-card').forEach(card => {
+        observer.observe(card);
+      });
+
+      // Category button interactions
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // Remove active class from all buttons
+          document.querySelectorAll('.category-btn').forEach(b => {
+            b.classList.remove('bg-primary');
+            b.classList.add('glass-effect');
+          });
+
+          // Add active class to clicked button
+          this.classList.remove('glass-effect');
+          this.classList.add('bg-primary');
+        });
+      });
+
+      // Package card hover effects
+      document.querySelectorAll('.package-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-8px) rotateX(5deg)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) rotateX(0)';
+        });
+      });
+
+      // Booking simulation
+      document.querySelectorAll('.book-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const packageName = this.closest('.package-card').querySelector('h3').textContent;
+          alert(`Booking process started for ${packageName}! You would be redirected to our secure booking form.`);
+        });
+      });
+
+      // Customization simulation
+      document.querySelectorAll('.customize-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const packageName = this.closest('.package-card').querySelector('h3').textContent;
+          showCustomizationModal(packageName);
+        });
+      });
+
+      // Customization Modal
+      function showCustomizationModal(packageName) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+        modal.innerHTML = `
+          <div class="dark-glass rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-slide-in">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-2xl font-bold gradient-text">Customize ${packageName}</h3>
+              <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div class="space-y-6">
+              <div>
+                <h4 class="text-lg font-semibold mb-3">Add Extra Services</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <label class="flex items-center space-x-3 p-3 glass-effect rounded-lg cursor-pointer hover:bg-opacity-20">
+                    <input type="checkbox" class="text-primary rounded">
+                    <span>Live Streaming (+$299)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-3 glass-effect rounded-lg cursor-pointer hover:bg-opacity-20">
+                    <input type="checkbox" class="text-primary rounded">
+                    <span>Photo Booth (+$199)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-3 glass-effect rounded-lg cursor-pointer hover:bg-opacity-20">
+                    <input type="checkbox" class="text-primary rounded">
+                    <span>Extra Hour (+$150)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-3 glass-effect rounded-lg cursor-pointer hover:bg-opacity-20">
+                    <input type="checkbox" class="text-primary rounded">
+                    <span>Premium Bar (+$399)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="text-lg font-semibold mb-3">Guest Count</h4>
+                <input type="range" min="10" max="200" value="50" class="w-full accent-primary">
+                <div class="flex justify-between text-sm text-gray-400 mt-1">
+                  <span>10 guests</span>
+                  <span id="guestCount">50 guests</span>
+                  <span>200 guests</span>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="text-lg font-semibold mb-3">Special Requests</h4>
+                <textarea class="w-full p-3 glass-effect rounded-lg bg-transparent border-none resize-none" rows="3" placeholder="Any special requirements or preferences..."></textarea>
+              </div>
+
+              <div class="flex space-x-4">
+                <button class="flex-1 book-btn py-3 rounded-xl font-semibold">
+                  <i class="fas fa-calendar-check mr-2"></i>
+                  Book Customized Package
+                </button>
+                <button onclick="this.closest('.fixed').remove()" class="px-6 py-3 glass-effect rounded-xl font-semibold hover:bg-opacity-20">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Update guest count display
+        const slider = modal.querySelector('input[type="range"]');
+        const display = modal.querySelector('#guestCount');
+        slider.addEventListener('input', function() {
+          display.textContent = this.value + ' guests';
+        });
+      }
+
+      // Smooth scrolling for navigation
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+
+      // Add floating animation to orbs
+      const orbs = document.querySelectorAll('.floating-orb');
+      orbs.forEach((orb, index) => {
+        orb.style.animationDelay = `${index * 2}s`;
+      });
+
+      // Price calculation demo
+      function calculateSavings() {
+        const packages = document.querySelectorAll('.package-card');
+        packages.forEach(pkg => {
+          const currentPrice = pkg.querySelector('.text-primary');
+          const originalPrice = pkg.querySelector('.price-strike');
+          if (currentPrice && originalPrice) {
+            const current = parseFloat(currentPrice.textContent.replace('
+          , '').replace(',', ''));
+            const original = parseFloat(originalPrice.textContent.replace('
+          , '').replace(',', ''));
+            const savings = original - current;
+
+            // Add sparkle effect to savings
+            const savingsBadge = pkg.querySelector('.savings-badge');
+            if (savingsBadge) {
+              savingsBadge.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1) rotate(5deg)';
+              });
+              savingsBadge.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+              });
+            }
+          }
+        });
+      }
+
+      // Initialize on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        calculateSavings();
+
+        // Add stagger effect to cards
+        const cards = document.querySelectorAll('.package-card');
+        cards.forEach((card, index) => {
+          card.style.animationDelay = `${0.3 + (index * 0.1)}s`;
+        });
+      });
+    </script>
+  </body>
+</html>

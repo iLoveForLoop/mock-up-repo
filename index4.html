@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eventory - Enhanced Event Planning Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6366f1",
+              secondary: "#8b5cf6",
+              accent: "#f59e0b",
+              dark: "#0f172a",
+              "glass-bg": "rgba(255, 255, 255, 0.1)",
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              glow: "glow 2s ease-in-out infinite alternate",
+              "slide-up": "slideUp 0.5s ease-out",
+              "slide-in": "slideIn 0.3s ease-out",
+              "fade-in": "fadeIn 0.3s ease-out",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+              glow: {
+                "0%": { boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)" },
+                "100%": { boxShadow: "0 0 40px rgba(99, 102, 241, 0.8)" },
+              },
+              slideUp: {
+                "0%": { opacity: "0", transform: "translateY(30px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              slideIn: {
+                "0%": { opacity: "0", transform: "scale(0.9)" },
+                "100%": { opacity: "1", transform: "scale(1)" },
+              },
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .dark-glass {
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.3),
+          rgba(139, 92, 246, 0.3)
+        );
+        filter: blur(40px);
+        animation: float 8s ease-in-out infinite;
+      }
+      .step-indicator {
+        transition: all 0.3s ease;
+      }
+      .step-indicator.active {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        transform: scale(1.1);
+      }
+      .step-indicator.completed {
+        background: #10b981;
+      }
+      .service-pill {
+        transition: all 0.3s ease;
+      }
+      .service-pill:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+      }
+      .service-pill.selected {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+      }
+      .vendor-card {
+        transition: all 0.3s ease;
+      }
+      .vendor-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      }
+      .vendor-card.selected {
+        border: 2px solid #6366f1;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.1),
+          rgba(139, 92, 246, 0.1)
+        );
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white min-h-screen overflow-x-hidden"
+  >
+    <!-- Floating Orbs Background -->
+    <div
+      class="floating-orb w-72 h-72 top-10 -left-20"
+      style="animation-delay: 0s"
+    ></div>
+    <div
+      class="floating-orb w-96 h-96 top-1/3 -right-32"
+      style="animation-delay: 2s"
+    ></div>
+    <div
+      class="floating-orb w-64 h-64 bottom-1/4 left-1/4"
+      style="animation-delay: 4s"
+    ></div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen flex items-center justify-center p-4">
+      <div class="text-center">
+        <h1 class="text-6xl font-bold mb-8 gradient-text animate-slide-up">
+          Eventory
+        </h1>
+        <p
+          class="text-xl mb-12 text-gray-300 animate-slide-up"
+          style="animation-delay: 0.2s"
+        >
+          Your Event Planning Partner
+        </p>
+        <button
+          onclick="openEventModal()"
+          class="bg-gradient-to-r from-primary to-secondary px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-glow animate-slide-up"
+          style="animation-delay: 0.4s"
+        >
+          <i class="fas fa-calendar-plus mr-3"></i>
+          Organize an Event
+          <i class="fas fa-sparkles ml-3"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div
+      id="eventModal"
+      class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden items-center justify-center p-4"
+    >
+      <div
+        class="dark-glass rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-slide-in"
+      >
+        <!-- Modal Header -->
+        <div
+          class="flex items-center justify-between p-6 border-b border-white/10"
+        >
+          <div class="flex items-center space-x-3">
+            <div
+              class="bg-gradient-to-r from-primary to-secondary p-2 rounded-xl"
+            >
+              <i class="fas fa-calendar-stars text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold">Organize an Event</h2>
+          </div>
+          <button
+            onclick="closeEventModal()"
+            class="text-gray-400 hover:text-white transition-colors"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Step Indicators -->
+        <div
+          class="flex justify-center items-center space-x-4 p-6 border-b border-white/10"
+        >
+          <div
+            class="step-indicator active w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+            id="step1"
+          >
+            1
+          </div>
+          <div class="w-12 h-0.5 bg-gray-600" id="line1"></div>
+          <div
+            class="step-indicator w-10 h-10 rounded-full flex items-center justify-center text-gray-400 font-bold bg-gray-700"
+            id="step2"
+          >
+            2
+          </div>
+          <div class="w-12 h-0.5 bg-gray-600" id="line2"></div>
+          <div
+            class="step-indicator w-10 h-10 rounded-full flex items-center justify-center text-gray-400 font-bold bg-gray-700"
+            id="step3"
+          >
+            3
+          </div>
+          <div class="w-12 h-0.5 bg-gray-600" id="line3"></div>
+          <div
+            class="step-indicator w-10 h-10 rounded-full flex items-center justify-center text-gray-400 font-bold bg-gray-700"
+            id="step4"
+          >
+            4
+          </div>
+        </div>
+
+        <!-- Step Content -->
+        <div class="p-6">
+          <!-- Step 1: Event Details -->
+          <div id="stepContent1" class="step-content animate-fade-in">
+            <h3 class="text-xl font-semibold mb-6">Event Details</h3>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium mb-2">Event Name</label>
+                <input
+                  type="text"
+                  id="eventName"
+                  value="Marc's Birthday Party"
+                  class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                />
+              </div>
+
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium mb-2">Date</label>
+                  <div class="relative">
+                    <input
+                      type="date"
+                      id="eventDate"
+                      value="2025-08-14"
+                      class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                    />
+                    <i
+                      class="fas fa-calendar absolute right-3 top-3 text-gray-400"
+                    ></i>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-2">Location</label>
+                  <input
+                    type="text"
+                    id="eventLocation"
+                    value="Cahayag"
+                    class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Services -->
+          <div id="stepContent2" class="step-content hidden">
+            <h3 class="text-xl font-semibold mb-6">Select Needed Services</h3>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <button
+                class="service-pill selected glass-effect px-4 py-3 rounded-xl text-center hover:bg-white/20 transition-all duration-300"
+                data-service="catering"
+              >
+                <i class="fas fa-utensils mb-2 block text-lg"></i>
+                Catering
+              </button>
+              <button
+                class="service-pill glass-effect px-4 py-3 rounded-xl text-center hover:bg-white/20 transition-all duration-300"
+                data-service="sound"
+              >
+                <i class="fas fa-volume-up mb-2 block text-lg"></i>
+                Sound System
+              </button>
+              <button
+                class="service-pill selected glass-effect px-4 py-3 rounded-xl text-center hover:bg-white/20 transition-all duration-300"
+                data-service="photographer"
+              >
+                <i class="fas fa-camera mb-2 block text-lg"></i>
+                Photographer
+              </button>
+              <button
+                class="service-pill glass-effect px-4 py-3 rounded-xl text-center hover:bg-white/20 transition-all duration-300"
+                data-service="entertainer"
+              >
+                <i class="fas fa-microphone mb-2 block text-lg"></i>
+                Entertainer
+              </button>
+              <button
+                class="service-pill glass-effect px-4 py-3 rounded-xl text-center hover:bg-white/20 transition-all duration-300"
+                data-service="makeup"
+              >
+                <i class="fas fa-paint-brush mb-2 block text-lg"></i>
+                Makeup Artist
+              </button>
+              <button
+                class="service-pill glass-effect px-4 py-3 rounded-xl text-center hover:bg-white/20 transition-all duration-300"
+                data-service="suit"
+              >
+                <i class="fas fa-tshirt mb-2 block text-lg"></i>
+                Suit/Dress Rental
+              </button>
+              <button
+                class="service-pill selected glass-effect px-4 py-3 rounded-xl text-center hover:bg-white/20 transition-all duration-300"
+                data-service="photobooth"
+              >
+                <i class="fas fa-images mb-2 block text-lg"></i>
+                Photo Booth
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Vendor Selection -->
+          <div id="stepContent3" class="step-content hidden">
+            <div id="vendorSelection">
+              <!-- Catering Vendor -->
+              <div class="vendor-section mb-8">
+                <h3 class="text-xl font-semibold mb-4">
+                  Select vendor for <span class="text-primary">Catering</span>
+                </h3>
+                <p class="text-gray-400 mb-6">
+                  Choose a vendor for this service to see their price range.
+                </p>
+
+                <div
+                  class="vendor-card selected dark-glass rounded-2xl p-6 cursor-pointer"
+                >
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-4">
+                      <img
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23f59e0b' rx='15'/%3E%3Ctext x='30' y='35' text-anchor='middle' fill='white' font-size='24' font-weight='bold'%3ETT%3C/text%3E%3C/svg%3E"
+                        alt="Tasty Treats Catering"
+                        class="w-15 h-15 rounded-xl"
+                      />
+                      <div>
+                        <h4 class="text-lg font-semibold">
+                          Tasty Treats Catering
+                        </h4>
+                        <p class="text-gray-400 text-sm">Catering</p>
+                        <div class="flex items-center space-x-2 mt-1">
+                          <div class="flex items-center space-x-1">
+                            <i class="fas fa-star text-yellow-400 text-sm"></i>
+                            <span class="text-sm">4.5</span>
+                          </div>
+                          <span
+                            class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full"
+                            >Health Cert</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      class="bg-primary px-3 py-1 rounded-full text-sm font-medium"
+                      >SELECTED</span
+                    >
+                  </div>
+
+                  <div class="mt-4">
+                    <p class="text-sm text-gray-400 mb-2">PRICE RANGE</p>
+                    <p class="text-2xl font-bold">₱14,000 - ₱25,000</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Photography Vendor -->
+              <div class="vendor-section mb-8">
+                <h3 class="text-xl font-semibold mb-4">
+                  Select vendor for
+                  <span class="text-primary">Photographer</span>
+                </h3>
+                <p class="text-gray-400 mb-6">
+                  Choose a vendor for this service to see their price range.
+                </p>
+
+                <div
+                  class="vendor-card selected dark-glass rounded-2xl p-6 cursor-pointer"
+                >
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-4">
+                      <img
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%236366f1' rx='15'/%3E%3Ctext x='30' y='35' text-anchor='middle' fill='white' font-size='20' font-weight='bold'%3EML%3C/text%3E%3C/svg%3E"
+                        alt="Memory Lane Photography"
+                        class="w-15 h-15 rounded-xl"
+                      />
+                      <div>
+                        <h4 class="text-lg font-semibold">
+                          Memory Lane Photography
+                        </h4>
+                        <p class="text-gray-400 text-sm">Photographer</p>
+                        <div class="flex items-center space-x-2 mt-1">
+                          <div class="flex items-center space-x-1">
+                            <i class="fas fa-star text-yellow-400 text-sm"></i>
+                            <span class="text-sm">4.9</span>
+                          </div>
+                          <span
+                            class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full"
+                            >DTI Permit</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      class="bg-primary px-3 py-1 rounded-full text-sm font-medium"
+                      >SELECTED</span
+                    >
+                  </div>
+
+                  <div class="mt-4">
+                    <p class="text-sm text-gray-400 mb-2">PRICE RANGE</p>
+                    <p class="text-2xl font-bold">₱6,000 - ₱9,000</p>
+                    <p class="text-sm text-primary">
+                      Price range: ₱6,000 - ₱9,000
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Photo Booth Vendor -->
+              <div class="vendor-section">
+                <h3 class="text-xl font-semibold mb-4">
+                  Select vendor for
+                  <span class="text-primary">Photo Booth</span>
+                </h3>
+                <p class="text-gray-400 mb-6">
+                  Choose a vendor for this service to see their price range.
+                </p>
+
+                <div
+                  class="vendor-card selected dark-glass rounded-2xl p-6 cursor-pointer"
+                >
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-4">
+                      <img
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%238b5cf6' rx='15'/%3E%3Ctext x='30' y='35' text-anchor='middle' fill='white' font-size='20' font-weight='bold'%3EPB%3C/text%3E%3C/svg%3E"
+                        alt="Party Booths Co."
+                        class="w-15 h-15 rounded-xl"
+                      />
+                      <div>
+                        <h4 class="text-lg font-semibold">Party Booths Co.</h4>
+                        <p class="text-gray-400 text-sm">Photo Booth</p>
+                        <div class="flex items-center space-x-2 mt-1">
+                          <div class="flex items-center space-x-1">
+                            <i class="fas fa-star text-yellow-400 text-sm"></i>
+                            <span class="text-sm">4.6</span>
+                          </div>
+                          <span
+                            class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full"
+                            >DTI Permit</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      class="bg-primary px-3 py-1 rounded-full text-sm font-medium"
+                      >SELECTED</span
+                    >
+                  </div>
+
+                  <div class="mt-4">
+                    <p class="text-sm text-gray-400 mb-2">PRICE RANGE</p>
+                    <p class="text-2xl font-bold">₱5,000 - ₱7,000</p>
+                    <p class="text-sm text-primary">
+                      Price range: ₱5,000 - ₱7,000
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Summary -->
+          <div id="stepContent4" class="step-content hidden">
+            <div class="space-y-6">
+              <div class="dark-glass rounded-2xl p-6">
+                <h3 class="text-xl font-semibold mb-4">Event Summary</h3>
+
+                <div class="space-y-3 mb-6">
+                  <div class="flex justify-between">
+                    <span class="font-medium">Event:</span>
+                    <span>Marc's Birthday Party</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="font-medium">Date:</span>
+                    <span>2025-08-14</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="font-medium">Location:</span>
+                    <span>Cahayag</span>
+                  </div>
+                </div>
+
+                <h4 class="font-semibold mb-4">Services:</h4>
+                <div class="space-y-3">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <span class="font-medium"
+                        >Catering — Tasty Treats Catering</span
+                      >
+                      <span class="text-sm text-gray-400 block"
+                        >(₱14,000 - ₱25,000)</span
+                      >
+                    </div>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <span class="font-medium"
+                        >Photographer — Memory Lane Photography</span
+                      >
+                      <span class="text-sm text-gray-400 block"
+                        >(₱6,000 - ₱9,000)</span
+                      >
+                    </div>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <span class="font-medium"
+                        >Photo Booth — Party Booths Co.</span
+                      >
+                      <span class="text-sm text-gray-400 block"
+                        >(₱5,000 - ₱7,000)</span
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-t border-white/10 mt-6 pt-4">
+                  <div
+                    class="flex justify-between items-center text-xl font-bold"
+                  >
+                    <span>Total:</span>
+                    <span class="gradient-text">₱25,000 - ₱41,000</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div
+          class="flex justify-between items-center p-6 border-t border-white/10"
+        >
+          <button
+            id="backBtn"
+            onclick="previousStep()"
+            class="px-6 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300 hidden"
+          >
+            <i class="fas fa-arrow-left mr-2"></i>Back
+          </button>
+          <div class="flex space-x-3 ml-auto">
+            <button
+              id="nextBtn"
+              onclick="nextStep()"
+              class="bg-gradient-to-r from-primary to-secondary px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+            >
+              Next <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+            <button
+              id="finishBtn"
+              onclick="finishEvent()"
+              class="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105 hidden"
+            >
+              <i class="fas fa-check mr-2"></i>Finish
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentStep = 1;
+      const totalSteps = 4;
+
+      function openEventModal() {
+        document.getElementById("eventModal").classList.remove("hidden");
+        document.getElementById("eventModal").classList.add("flex");
+      }
+
+      function closeEventModal() {
+        document.getElementById("eventModal").classList.add("hidden");
+        document.getElementById("eventModal").classList.remove("flex");
+      }
+
+      function updateStepIndicators() {
+        for (let i = 1; i <= totalSteps; i++) {
+          const stepEl = document.getElementById(`step${i}`);
+          const lineEl = document.getElementById(`line${i}`);
+
+          if (i < currentStep) {
+            stepEl.className =
+              "step-indicator completed w-10 h-10 rounded-full flex items-center justify-center text-white font-bold";
+            stepEl.innerHTML = '<i class="fas fa-check"></i>';
+            if (lineEl) lineEl.className = "w-12 h-0.5 bg-green-500";
+          } else if (i === currentStep) {
+            stepEl.className =
+              "step-indicator active w-10 h-10 rounded-full flex items-center justify-center text-white font-bold";
+            stepEl.innerHTML = i;
+            if (lineEl) lineEl.className = "w-12 h-0.5 bg-gray-600";
+          } else {
+            stepEl.className =
+              "step-indicator w-10 h-10 rounded-full flex items-center justify-center text-gray-400 font-bold bg-gray-700";
+            stepEl.innerHTML = i;
+            if (lineEl) lineEl.className = "w-12 h-0.5 bg-gray-600";
+          }
+        }
+      }
+
+      function showStep(step) {
+        // Hide all steps
+        for (let i = 1; i <= totalSteps; i++) {
+          document.getElementById(`stepContent${i}`).classList.add("hidden");
+        }
+
+        // Show current step
+        document
+          .getElementById(`stepContent${step}`)
+          .classList.remove("hidden");
+
+        // Update buttons
+        const backBtn = document.getElementById("backBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const finishBtn = document.getElementById("finishBtn");
+
+        if (step === 1) {
+          backBtn.classList.add("hidden");
+        } else {
+          backBtn.classList.remove("hidden");
+        }
+
+        if (step === totalSteps) {
+          nextBtn.classList.add("hidden");
+          finishBtn.classList.remove("hidden");
+        } else {
+          nextBtn.classList.remove("hidden");
+          finishBtn.classList.add("hidden");
+        }
+      }
+
+      function nextStep() {
+        if (currentStep < totalSteps) {
+          currentStep++;
+          updateStepIndicators();
+          showStep(currentStep);
+        }
+      }
+
+      function previousStep() {
+        if (currentStep > 1) {
+          currentStep--;
+          updateStepIndicators();
+          showStep(currentStep);
+        }
+      }
+
+      function finishEvent() {
+        alert("Event planning completed! 🎉");
+        closeEventModal();
+      }
+
+      // Service pill toggle functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        const servicePills = document.querySelectorAll(".service-pill");
+
+        servicePills.forEach((pill) => {
+          pill.addEventListener("click", function () {
+            this.classList.toggle("selected");
+          });
+        });
+      });
+
+      // Close modal when clicking outside
+      document
+        .getElementById("eventModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeEventModal();
+          }
+        });
+    </script>
+  </body>
+</html>
