@@ -156,6 +156,14 @@
         transform: scale(1.05);
         box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
       }
+
+      html {
+        scrollbar-width: none; /* For Firefox */
+        -ms-overflow-style: none; /* For Internet Explorer and Edge */
+      }
+      html::-webkit-scrollbar {
+        display: none; /* For Chrome, Safari, and Opera */
+      }
     </style>
   </head>
   <body
