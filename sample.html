@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eventory - Vendor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6366f1",
+              secondary: "#8b5cf6",
+              accent: "#f59e0b",
+              dark: "#0f172a",
+              "glass-bg": "rgba(255, 255, 255, 0.1)",
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              glow: "glow 2s ease-in-out infinite alternate",
+              "slide-up": "slideUp 0.5s ease-out",
+              "slide-in": "slideIn 0.3s ease-out",
+              pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+              glow: {
+                "0%": { boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)" },
+                "100%": { boxShadow: "0 0 40px rgba(99, 102, 241, 0.8)" },
+              },
+              slideUp: {
+                "0%": { opacity: "0", transform: "translateY(30px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              slideIn: {
+                "0%": { opacity: "0", transform: "translateX(-20px)" },
+                "100%": { opacity: "1", transform: "translateX(0)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .dark-glass {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.3),
+          rgba(139, 92, 246, 0.3)
+        );
+        filter: blur(40px);
+        animation: float 8s ease-in-out infinite;
+      }
+      .sidebar-item {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .sidebar-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.05);
+      }
+      .sidebar-item.active {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.3),
+          rgba(139, 92, 246, 0.3)
+        );
+        border-left: 3px solid #6366f1;
+      }
+      .notification-badge {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      .content-area {
+        background: linear-gradient(
+          135deg,
+          rgba(15, 23, 42, 0.7),
+          rgba(30, 41, 59, 0.7)
+        );
+        backdrop-filter: blur(10px);
+      }
+      .status-pending {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+      .status-confirmed {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+      .status-completed {
+        background: rgba(99, 102, 241, 0.2);
+        color: #6366f1;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+      }
+      .calendar-day {
+        transition: all 0.2s ease;
+      }
+      .calendar-day:hover {
+        background: rgba(99, 102, 241, 0.2);
+        transform: scale(1.1);
+      }
+      .calendar-day.today {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+      }
+      .calendar-day.has-event {
+        background: rgba(245, 158, 11, 0.3);
+        border: 1px solid #f59e0b;
+      }
+      .calendar-day.has-event::after {
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        background: #f59e0b;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-x-hidden min-h-screen"
+  >
+    <!-- Floating Orbs Background -->
+    <div
+      class="floating-orb w-72 h-72 top-10 -left-20 z-0"
+      style="animation-delay: 0s"
+    ></div>
+    <div
+      class="floating-orb w-96 h-96 top-1/3 -right-32 z-0"
+      style="animation-delay: 2s"
+    ></div>
+    <div
+      class="floating-orb w-64 h-64 bottom-1/4 left-1/4 z-0"
+      style="animation-delay: 4s"
+    ></div>
+
+    <div class="flex min-h-screen relative z-10">
+      <!-- Sidebar -->
+      <div
+        class="w-20 hover:w-64 glass-effect border-r border-white/10 flex flex-col transition-all duration-300 group"
+      >
+        <!-- Header -->
+        <div class="p-4 border-b border-white/10">
+          <div
+            class="flex items-center justify-center group-hover:justify-start transition-all duration-300"
+          >
+            <div
+              class="bg-gradient-to-r from-primary to-secondary p-2 rounded-xl shadow-lg animate-glow"
+            >
+              <i class="fas fa-calendar-stars text-lg text-white"></i>
+            </div>
+            <div
+              class="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+            >
+              <span class="text-lg font-bold gradient-text">Eventory</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="flex-1 py-4 space-y-1 overflow-hidden">
+          <!-- Dashboard -->
+          <div
+            class="sidebar-item active p-3 mx-2 rounded-lg cursor-pointer group/item relative"
+            title="Dashboard"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-home text-lg text-primary min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >Dashboard</span
+              >
+            </div>
+          </div>
+
+          <!-- My Events -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item relative"
+            title="My Events"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i
+                  class="fas fa-calendar-alt text-lg text-secondary min-w-[20px] text-center"
+                ></i>
+                <span
+                  class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                  >My Events</span
+                >
+              </div>
+              <span
+                class="bg-primary text-white text-xs px-1.5 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                >5</span
+              >
+            </div>
+          </div>
+
+          <!-- Requests -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item relative"
+            title="Requests"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i
+                  class="fas fa-envelope text-lg text-accent min-w-[20px] text-center"
+                ></i>
+                <span
+                  class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                  >Requests</span
+                >
+              </div>
+              <span
+                class="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full notification-badge opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                >3</span
+              >
+            </div>
+            <!-- Mini notification indicator for collapsed state -->
+            <div
+              class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full group-hover:hidden"
+            ></div>
+          </div>
+
+          <!-- My Services -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item"
+            title="My Services"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-list text-lg text-green-400 min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >My Services</span
+              >
+            </div>
+          </div>
+
+          <!-- Add Service -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item"
+            title="Add New Service"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-plus-circle text-lg text-emerald-400 min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >Add Service</span
+              >
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item relative"
+            title="Messages"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i
+                  class="fas fa-comments text-lg text-blue-400 min-w-[20px] text-center"
+                ></i>
+                <span
+                  class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                  >Messages</span
+                >
+              </div>
+              <span
+                class="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full notification-badge opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                >7</span
+              >
+            </div>
+            <!-- Mini notification indicator -->
+            <div
+              class="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full group-hover:hidden"
+            ></div>
+          </div>
+
+          <!-- Profile -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item"
+            title="My Profile"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-user text-lg text-purple-400 min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >Profile</span
+              >
+            </div>
+          </div>
+
+          <!-- Portfolio -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item"
+            title="My Portfolio"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-camera text-lg text-pink-400 min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >Portfolio</span
+              >
+            </div>
+          </div>
+
+          <!-- Reviews -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item"
+            title="My Reviews - 4.8 stars"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i
+                  class="fas fa-star text-lg text-yellow-400 min-w-[20px] text-center"
+                ></i>
+                <span
+                  class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                  >Reviews</span
+                >
+              </div>
+              <div
+                class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
+                <span class="text-yellow-400 text-sm">4.8</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Earnings -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item"
+            title="Earnings"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-dollar-sign text-lg text-green-500 min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >Earnings</span
+              >
+            </div>
+          </div>
+
+          <!-- Reports -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item"
+            title="Reports"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-chart-line text-lg text-indigo-400 min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >Reports</span
+              >
+            </div>
+          </div>
+
+          <!-- Settings -->
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item"
+            title="Settings"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-cog text-lg text-gray-400 min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >Settings</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-2 border-t border-white/10">
+          <div
+            class="sidebar-item p-3 mx-2 rounded-lg cursor-pointer group/item hover:bg-red-500/20"
+            title="Logout"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-sign-out-alt text-lg text-red-400 min-w-[20px] text-center"
+              ></i>
+              <span
+                class="ml-3 font-medium text-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"
+                >Logout</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="flex-1 content-area p-8">
+        <div class="max-w-7xl mx-auto">
+          <!-- Welcome Header -->
+          <div class="mb-8">
+            <h1 class="text-4xl font-bold gradient-text mb-2">
+              Welcome back, Elite Catering Co.!
+            </h1>
+            <p class="text-gray-300 text-lg">
+              Here's what's happening with your business today.
+            </p>
+          </div>
+
+          <!-- Quick Stats Cards -->
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          >
+            <div
+              class="glass-effect p-6 rounded-2xl hover:scale-105 transition-transform duration-300"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-calendar-check text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-primary">5</span>
+              </div>
+              <h3 class="font-semibold text-white">Active Bookings</h3>
+              <p class="text-sm text-gray-400">This month</p>
+            </div>
+
+            <div
+              class="glass-effect p-6 rounded-2xl hover:scale-105 transition-transform duration-300"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-peso-sign text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-green-400">₱85,000</span>
+              </div>
+              <h3 class="font-semibold text-white">Total Earnings</h3>
+              <p class="text-sm text-gray-400">This month</p>
+            </div>
+
+            <div
+              class="glass-effect p-6 rounded-2xl hover:scale-105 transition-transform duration-300"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-star text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-yellow-400">4.8</span>
+              </div>
+              <h3 class="font-semibold text-white">Average Rating</h3>
+              <p class="text-sm text-gray-400">Based on 142 reviews</p>
+            </div>
+
+            <div
+              class="glass-effect p-6 rounded-2xl hover:scale-105 transition-transform duration-300"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div
+                  class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-envelope text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-blue-400">3</span>
+              </div>
+              <h3 class="font-semibold text-white">New Requests</h3>
+              <p class="text-sm text-gray-400">Awaiting response</p>
+            </div>
+          </div>
+
+          <!-- Main Content Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Events and Activity -->
+            <div class="lg:col-span-2 space-y-8">
+              <!-- Recent Bookings -->
+              <div class="glass-effect p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-6">
+                  <h2 class="text-xl font-bold text-white">Event Calendar</h2>
+                  <div class="flex items-center space-x-2">
+                    <button
+                      id="prevMonth"
+                      class="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    >
+                      <i class="fas fa-chevron-left text-gray-400"></i>
+                    </button>
+                    <span
+                      id="currentMonth"
+                      class="text-white font-medium px-3"
+                    ></span>
+                    <button
+                      id="nextMonth"
+                      class="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    >
+                      <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-container">
+                  <!-- Days of week -->
+                  <div class="grid grid-cols-7 gap-1 mb-2">
+                    <div
+                      class="text-center text-xs font-medium text-gray-400 py-2"
+                    >
+                      Sun
+                    </div>
+                    <div
+                      class="text-center text-xs font-medium text-gray-400 py-2"
+                    >
+                      Mon
+                    </div>
+                    <div
+                      class="text-center text-xs font-medium text-gray-400 py-2"
+                    >
+                      Tue
+                    </div>
+                    <div
+                      class="text-center text-xs font-medium text-gray-400 py-2"
+                    >
+                      Wed
+                    </div>
+                    <div
+                      class="text-center text-xs font-medium text-gray-400 py-2"
+                    >
+                      Thu
+                    </div>
+                    <div
+                      class="text-center text-xs font-medium text-gray-400 py-2"
+                    >
+                      Fri
+                    </div>
+                    <div
+                      class="text-center text-xs font-medium text-gray-400 py-2"
+                    >
+                      Sat
+                    </div>
+                  </div>
+
+                  <!-- Calendar days -->
+                  <div id="calendarDays" class="grid grid-cols-7 gap-1">
+                    <!-- Days will be populated by JavaScript -->
+                  </div>
+                </div>
+
+                <!-- Calendar Legend -->
+                <div class="mt-4 pt-4 border-t border-white/10">
+                  <div class="flex items-center justify-between text-xs">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-3 h-3 bg-primary rounded-full"></div>
+                      <span class="text-gray-400">Today</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <div class="w-3 h-3 bg-accent rounded-full"></div>
+                      <span class="text-gray-400">Event</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Here -->
+              </div>
+
+              <!-- Recent Activity -->
+              <div class="glass-effect p-6 rounded-2xl">
+                <h2 class="text-2xl font-bold text-white mb-6">
+                  Recent Activity
+                </h2>
+                <div class="space-y-4">
+                  <div
+                    class="flex items-center space-x-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div
+                      class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center"
+                    >
+                      <i class="fas fa-check text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-white font-medium">
+                        New booking confirmed for Wedding Reception
+                      </p>
+                      <p class="text-gray-400 text-sm">2 hours ago • ₱45,000</p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="flex items-center space-x-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div
+                      class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center"
+                    >
+                      <i class="fas fa-message text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-white font-medium">
+                        New message from Maria Santos
+                      </p>
+                      <p class="text-gray-400 text-sm">
+                        4 hours ago • Birthday party inquiry
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="flex items-center space-x-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div
+                      class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center"
+                    >
+                      <i class="fas fa-star text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-white font-medium">
+                        New 5-star review received
+                      </p>
+                      <p class="text-gray-400 text-sm">
+                        1 day ago • Corporate event
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column - Calendar and Stats -->
+            <div class="space-y-8">
+              <!-- Event Calendar -->
+              <div class="glass-effect p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-6">
+                  <h2 class="text-2xl font-bold text-white">Recent Bookings</h2>
+                  <button
+                    class="text-primary hover:text-secondary transition-colors"
+                  >
+                    <i class="fas fa-plus mr-2"></i>View All
+                  </button>
+                </div>
+
+                <div class="space-y-4">
+                  <!-- Booking Item 1 -->
+                  <div
+                    class="glass-effect p-4 rounded-xl hover:scale-[1.02] transition-all duration-300"
+                  >
+                    <div class="flex items-center justify-between mb-3">
+                      <h3 class="font-bold text-lg">Sarah & John's Wedding</h3>
+                      <span
+                        class="status-pending px-3 py-1 rounded-full text-sm font-medium"
+                        >Pending</span
+                      >
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                      <div class="flex items-center text-gray-300">
+                        <i class="fas fa-calendar mr-2 text-primary"></i>
+                        March 15, 2025
+                      </div>
+                      <div class="flex items-center text-gray-300">
+                        <i
+                          class="fas fa-map-marker-alt mr-2 text-secondary"
+                        ></i>
+                        Marco Polo Hotel, Cebu
+                      </div>
+                      <div class="flex items-center text-gray-300">
+                        <i class="fas fa-users mr-2 text-accent"></i>
+                        150 guests
+                      </div>
+                      <div class="flex items-center text-gray-300">
+                        <i class="fas fa-peso-sign mr-2 text-green-400"></i>
+                        ₱85,000 budget
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-4">
+                      <div class="flex items-center space-x-2">
+                        <div class="flex -space-x-2">
+                          <div
+                            class="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full border-2 border-slate-900 flex items-center justify-center"
+                          >
+                            <i class="fas fa-camera text-xs text-white"></i>
+                          </div>
+                          <div
+                            class="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-full border-2 border-slate-900 flex items-center justify-center"
+                          >
+                            <i class="fas fa-utensils text-xs text-white"></i>
+                          </div>
+                          <div
+                            class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-red-500 rounded-full border-2 border-slate-900 flex items-center justify-center"
+                          >
+                            <i class="fas fa-music text-xs text-white"></i>
+                          </div>
+                        </div>
+                        <span class="text-gray-300 text-sm"
+                          >+2 more vendors</span
+                        >
+                      </div>
+                      <button
+                        class="bg-gradient-to-r from-primary to-secondary px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all hover:scale-105"
+                      >
+                        <i class="fas fa-eye mr-2"></i>View Details
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Booking Item 2 -->
+                  <div
+                    class="glass-effect p-4 rounded-xl hover:scale-[1.02] transition-all duration-300"
+                  >
+                    <div class="flex items-center justify-between mb-3">
+                      <h3 class="font-bold text-lg">Tech Corp Annual Gala</h3>
+                      <span
+                        class="status-confirmed px-3 py-1 rounded-full text-sm font-medium"
+                        >Confirmed</span
+                      >
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                      <div class="flex items-center text-gray-300">
+                        <i class="fas fa-calendar mr-2 text-primary"></i>
+                        March 22, 2025
+                      </div>
+                      <div class="flex items-center text-gray-300">
+                        <i
+                          class="fas fa-map-marker-alt mr-2 text-secondary"
+                        ></i>
+                        Shangri-La Hotel, Makati
+                      </div>
+                      <div class="flex items-center text-gray-300">
+                        <i class="fas fa-users mr-2 text-accent"></i>
+                        200 guests
+                      </div>
+                      <div class="flex items-center text-gray-300">
+                        <i class="fas fa-peso-sign mr-2 text-green-400"></i>
+                        ₱120,000 budget
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-4">
+                      <div class="flex items-center space-x-2">
+                        <span class="text-yellow-400 text-sm">4.9 ★</span>
+                        <span class="text-gray-300 text-sm"
+                          >Previous client</span
+                        >
+                      </div>
+                      <button
+                        class="bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all hover:scale-105"
+                      >
+                        <i class="fas fa-check mr-2"></i>Confirmed
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Stats -->
+              <div class="space-y-4">
+                <div
+                  class="glass-effect p-6 rounded-2xl hover:scale-105 transition-all duration-300"
+                >
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-gray-300 text-sm">This Month</p>
+                      <p class="text-3xl font-bold text-secondary">12</p>
+                      <p class="text-xs text-gray-400">Events booked</p>
+                    </div>
+                    <div class="bg-secondary/20 p-3 rounded-xl">
+                      <i class="fas fa-chart-line text-secondary text-xl"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="glass-effect p-6 rounded-2xl hover:scale-105 transition-all duration-300"
+                >
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-gray-300 text-sm">Revenue</p>
+                      <p class="text-3xl font-bold text-green-400">₱245K</p>
+                      <p class="text-xs text-gray-400">+15% from last month</p>
+                    </div>
+                    <div class="bg-green-400/20 p-3 rounded-xl">
+                      <i class="fas fa-peso-sign text-green-400 text-xl"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="glass-effect p-6 rounded-2xl hover:scale-105 transition-all duration-300"
+                >
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-gray-300 text-sm">Client Rating</p>
+                      <p class="text-3xl font-bold text-yellow-400">4.8</p>
+                      <p class="text-xs text-gray-400">From 142 reviews</p>
+                    </div>
+                    <div class="bg-yellow-400/20 p-3 rounded-xl">
+                      <i class="fas fa-star text-yellow-400 text-xl"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upcoming Events -->
+              <div class="glass-effect p-6 rounded-2xl">
+                <h3 class="text-lg font-bold text-white mb-4">
+                  Upcoming Events
+                </h3>
+                <div class="space-y-3">
+                  <div
+                    class="flex items-center space-x-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div class="w-2 h-8 bg-primary rounded-full"></div>
+                    <div class="flex-1">
+                      <p class="text-white text-sm font-medium">
+                        Wedding Reception
+                      </p>
+                      <p class="text-gray-400 text-xs">March 15 • 6:00 PM</p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="flex items-center space-x-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div class="w-2 h-8 bg-secondary rounded-full"></div>
+                    <div class="flex-1">
+                      <p class="text-white text-sm font-medium">
+                        Corporate Gala
+                      </p>
+                      <p class="text-gray-400 text-xs">March 22 • 7:00 PM</p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="flex items-center space-x-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div class="w-2 h-8 bg-accent rounded-full"></div>
+                    <div class="flex-1">
+                      <p class="text-white text-sm font-medium">
+                        Birthday Party
+                      </p>
+                      <p class="text-gray-400 text-xs">March 28 • 2:00 PM</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Calendar functionality
+      const currentDate = new Date();
+      let currentMonth = currentDate.getMonth();
+      let currentYear = currentDate.getFullYear();
+
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      // Sample events data
+      const events = {
+        "2025-3-15": "Wedding Reception",
+        "2025-3-22": "Corporate Gala",
+        "2025-3-28": "Birthday Party",
+        "2025-4-5": "Anniversary Dinner",
+        "2025-4-12": "Business Meeting",
+      };
+
+      function generateCalendar(month, year) {
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+
+        document.getElementById(
+          "currentMonth"
+        ).textContent = `${months[month]} ${year}`;
+
+        const calendarDays = document.getElementById("calendarDays");
+        calendarDays.innerHTML = "";
+
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < firstDay; i++) {
+          const emptyDay = document.createElement("div");
+          emptyDay.className = "h-8";
+          calendarDays.appendChild(emptyDay);
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dayElement = document.createElement("div");
+          dayElement.className =
+            "calendar-day h-8 flex items-center justify-center text-sm cursor-pointer rounded-lg relative";
+          dayElement.textContent = day;
+
+          // Check if it's today
+          if (
+            year === today.getFullYear() &&
+            month === today.getMonth() &&
+            day === today.getDate()
+          ) {
+            dayElement.classList.add("today");
+          }
+
+          // Check if there's an event on this day
+          const dateKey = `${year}-${month + 1}-${day}`;
+          if (events[dateKey]) {
+            dayElement.classList.add("has-event");
+            dayElement.title = events[dateKey];
+          }
+
+          // Add click event
+          dayElement.addEventListener("click", function () {
+            if (events[dateKey]) {
+              alert(
+                `Event: ${events[dateKey]} on ${months[month]} ${day}, ${year}`
+              );
+            }
+          });
+
+          calendarDays.appendChild(dayElement);
+        }
+      }
+
+      // Initialize calendar
+      generateCalendar(currentMonth, currentYear);
+
+      // Navigation buttons
+      document
+        .getElementById("prevMonth")
+        .addEventListener("click", function () {
+          currentMonth--;
+          if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+          }
+          generateCalendar(currentMonth, currentYear);
+        });
+
+      document
+        .getElementById("nextMonth")
+        .addEventListener("click", function () {
+          currentMonth++;
+          if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+          }
+          generateCalendar(currentMonth, currentYear);
+        });
+
+      // Sidebar functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebarItems = document.querySelectorAll(".sidebar-item");
+
+        sidebarItems.forEach((item) => {
+          item.addEventListener("click", function () {
+            // Remove active class from all items
+            sidebarItems.forEach((i) => i.classList.remove("active"));
+            // Add active class to clicked item
+            this.classList.add("active");
+          });
+        });
+
+        // Add smooth scrolling animation for sidebar
+        const sidebar = document.querySelector(".w-20");
+        if (sidebar) {
+          sidebar.style.animation = "slideIn 0.5s ease-out";
+        }
+
+        // Add loading animation to cards
+        const cards = document.querySelectorAll(".glass-effect");
+        cards.forEach((card, index) => {
+          card.style.animation = `slideUp 0.5s ease-out ${index * 0.1}s both`;
+        });
+      });
+
+      // Add some interactive effects
+      document.querySelectorAll(".glass-effect").forEach((card) => {
+        card.addEventListener("mouseenter", function () {
+          this.style.transform = "translateY(-5px) scale(1.02)";
+        });
+
+        card.addEventListener("mouseleave", function () {
+          this.style.transform = "translateY(0) scale(1)";
+        });
+      });
+
+      // Notification system
+      function showNotification(message, type = "info") {
+        const notification = document.createElement("div");
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transition-all duration-300 ${
+          type === "success"
+            ? "bg-green-500"
+            : type === "error"
+            ? "bg-red-500"
+            : "bg-blue-500"
+        } text-white`;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.opacity = "0";
+          setTimeout(() => {
+            document.body.removeChild(notification);
+          }, 300);
+        }, 3000);
+      }
+
+      // Add click events to booking buttons
+      document.querySelectorAll("button").forEach((button) => {
+        if (button.textContent.includes("View Details")) {
+          button.addEventListener("click", function () {
+            showNotification("Opening event details...", "info");
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
